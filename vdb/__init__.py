@@ -64,7 +64,7 @@ class ScriptThread(threading.Thread):
     def run(self):
         try:
             exec(self.cobj, self.locals)
-        except Exception, e:
+        except Exception as e:
             traceback.print_exc()
             print('Script Error: %s' % repr(e))
 
@@ -81,6 +81,7 @@ def setupBreakOnEntry(trace):
             entrySymExpr = '%s.__entry' % (exefile,)
             otb = vtrace.OneTimeBreak(None, expression=entrySymExpr)
             trace.addBreakpoint(otb)
+
 
 class VdbTrace:
     """
@@ -102,10 +103,10 @@ class VdbTrace:
     def deregisterNotifier(self, event, notif):
         self.db.deregisterNotifier(event, notif)
 
-    #FIXME should we add modes to this?
+    # FIXME should we add modes to this?
 
     def selectThread(self, threadid):
-        #FIXME perhaps a thread selected LOCAL event?
+        # FIXME perhaps a thread selected LOCAL event?
         trace = self.db.getTrace()
         trace.selectThread(threadid)
         self.db.fireLocalNotifiers(vtrace.NOTIFY_BREAK, trace)
@@ -113,24 +114,25 @@ class VdbTrace:
     def __getattr__(self, name):
         return getattr(self.db.getTrace(), name)
 
+
 defconfig = {
 
-    'vdb':{
-        'BreakOnEntry':False,
-        'BreakOnMain':False,
+    'vdb': {
+        'BreakOnEntry': False,
+        'BreakOnMain': False,
 
-        'SymbolCacheActive':True,
-        'SymbolCachePath':e_config.gethomedir('.envi','symcache'),
+        'SymbolCacheActive': True,
+        'SymbolCachePath': e_config.gethomedir('.envi', 'symcache'),
 
         'KillOnQuit': False,
     },
 
-    'cli':{
-        'verbose':False,
+    'cli': {
+        'verbose': False,
         'aliases': {
-            '<f1>':'stepi',
-            '<f2>':'go -I 1',
-            '<f5>':'go',
+            '<f1>': 'stepi',
+            '<f2>': 'go -I 1',
+            '<f5>': 'go',
         }
     },
 

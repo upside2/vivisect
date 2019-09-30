@@ -358,9 +358,9 @@ class CobraAsyncTrans:
             try:
                 self.csock.sendMessage(self.mtype, self.objname, self.data)
                 return
-            except CobraAuthException, e:
+            except CobraAuthException as e:
                 raise
-            except (socket.error,CobraClosedException), e:
+            except (socket.error, CobraClosedException):
                 self.csock.reConnect()
 
     def wait(self):

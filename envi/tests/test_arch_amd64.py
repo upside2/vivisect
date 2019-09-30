@@ -6,6 +6,9 @@ import envi.archs.amd64 as e_amd64
 import vivisect
 import platform
 import unittest
+import logging
+
+logger = logging.getLogger(__name__)
 
 instrs = [
     ("bf9fb44900", 0x456000, 'mov edi,0x0049b49f'),
@@ -438,10 +441,10 @@ def generateTestInfo(ophexbytez='6e'):
     a64 = e_amd64.Amd64Module()
     opbytez = ophexbytez
     op = a64.archParseOpcode(opbytez.decode('hex'), 0, 0x4000)
-    print "opbytez = '%s'\noprepr = '%s'"%(opbytez,repr(op))
+    logger.info("opbytez = '%s'\noprepr = '%s'" % (opbytez, repr(op)))
     opvars=vars(op)
     opers = opvars.pop('opers')
-    print "opcheck = ",repr(opvars)
+    logger.info("opcheck = %s" % repr(opvars))
 
     opersvars = []
     for x in range(len(opers)):
@@ -449,5 +452,5 @@ def generateTestInfo(ophexbytez='6e'):
         opervars.pop('_dis_regctx')
         opersvars.append(opervars)
 
-    print "opercheck = %s" % (repr(opersvars))
+    logger.info("opercheck = %s" % (repr(opersvars)))
 

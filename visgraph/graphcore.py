@@ -9,7 +9,7 @@ import collections
 
 from binascii import hexlify
 
-from exc import *
+from visgraph.exc import *
 import visgraph.pathcore as vg_pathcore
 
 def guid(size=16):
@@ -264,7 +264,7 @@ class Graph:
         for k,v in myprops.items():
             try:
                 self.nodeprops[k][v].append(node)
-            except TypeError, e:
+            except TypeError:
                 pass
 
         return node
