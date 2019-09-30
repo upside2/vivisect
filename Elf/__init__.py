@@ -480,8 +480,7 @@ class Elf(vs_elf.Elf32, vs_elf.Elf64):
             rvaoff = rva - phrva
             return pgm.p_offset + rvaoff
 
-        raise 'omg',hex(rva)
-        return None
+        raise Exception('rvaToOffset: RVA: 0x%x failed to be converted to offset' % rva)
 
     def readAtOffset(self, off, size):
         '''

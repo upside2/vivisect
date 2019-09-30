@@ -180,15 +180,14 @@ class Graph:
         if curval == value:
             return False
 
-
         edge[3][prop] = value
 
         try:
-            if curval != None:
+            if curval is not None:
                 curlist = self.edgeprops[prop][curval]
-                curlist.remove( edge )
+                curlist.remove(edge)
             self.edgeprops[prop][value].append(edge)
-        except TypeError, e:
+        except TypeError:
             pass
 
         return True
@@ -216,7 +215,7 @@ class Graph:
                 curlist.remove( node )
 
             self.nodeprops[prop][value].append(node)
-        except TypeError, e:
+        except TypeError:
             pass # no value indexing for un-hashable values
 
         return True

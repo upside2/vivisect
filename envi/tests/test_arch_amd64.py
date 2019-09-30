@@ -389,7 +389,7 @@ class Amd64InstructionSet(unittest.TestCase):
         opbytez = 'a1a2345678aabbccdd'
         oprepr = 'mov eax,dword [0xddccbbaa785634a2]'
         opcheck =  {'iflags': 131072, 'va': 16384, 'repr': None, 'prefixes': 0, 'mnem': 'mov', 'opcode': 24577, 'size': 9}
-        opercheck = [{'tsize': 4, 'reg': 2097152}, {'tsize': 4, '_is_deref': True, 'imm': 15982355518468797602L}]
+        opercheck = [{'tsize': 4, 'reg': 2097152}, {'tsize': 4, '_is_deref': True, 'imm': 15982355518468797602}]
         self.checkOpcode( opbytez, 0x4000, oprepr, opcheck, opercheck, oprepr )
 
     def test_envi_amd64_disasm_SIB_Operands(self):

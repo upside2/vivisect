@@ -38,6 +38,7 @@ import struct
 import getopt
 import signal
 import inspect
+import logging
 import platform
 import traceback
 
@@ -54,6 +55,8 @@ import envi.symstore.symcache as e_symcache
 import cobra
 import vstruct
 from vtrace.const import *
+
+logger = logging.getLogger(__name__)
 
 remote = None       # If set, we're a vtrace client (set to serverhost)
 cobra_daemon = None
@@ -422,7 +425,7 @@ class Trace(e_mem.IMemory, e_reg.RegisterContext, e_resolv.SymbolResolver, objec
 
         except Exception as e:
             # getTargets->readMemory error on bva
-            print('getSymByAddrThunkAware: %s' % repr(e))
+            logger.warning('getSymByAddrThunkAware: %s' % repr(e))
 
         return None, False
 
@@ -1502,10 +1505,10 @@ def getTrace(target=None, **kwargs):
             #print '(put your username in there unless you want to put me in too... ;)'
             #raise Exception('procmod group membership required')
         if os.getuid() != 0:
-            print 'For NOW you *must* be root.  There are some crazy MACH perms...'
+            logger.warning('For NOW you *must* be root.  There are some crazy MACH perms...')
             raise Exception('You must be root for now (on OSX)....')
 
-        print 'Also... the darwin port is not even REMOTELY working yet.  Solid progress though...'
+        logger.warning('Also... the darwin port is not even REMOTELY working yet.  Solid progress though...')
 
         #'sudo dscl . append /Groups/procmod GroupMembership invisigoth'
         #'sudo dscl . read /Groups/procmod GroupMembership'

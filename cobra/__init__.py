@@ -17,13 +17,14 @@ import types
 import Queue
 import socket
 import struct
+import logging
 import urllib2
 import traceback
 try:
     import msgpack
     dumpargs = {}
-    loadargs = {'use_list':0}
-    if msgpack.version >= (0,4,1):
+    loadargs = {'use_list': 0}
+    if msgpack.version >= (0, 4, 1):
         dumpargs['use_bin_type'] = 1
         loadargs['encoding'] = 'utf-8'
 
@@ -32,15 +33,16 @@ except ImportError:
 
 import cPickle as pickle
 
-from threading import currentThread,Thread,RLock,Timer,Lock,Event
+from threading import currentThread, Thread, RLock, Timer, Lock, Event
 from SocketServer import ThreadingTCPServer, BaseRequestHandler
 
+logger = logging.getLogger(__name__)
 daemon = None
 verbose = False
 version = "Cobra2"
-COBRA_PORT=5656
-COBRASSL_PORT=5653
-cobra_retrymax = None # Optional *global* retry max count
+COBRA_PORT = 5656
+COBRASSL_PORT = 5653
+cobra_retrymax = None  # Optional *global* retry max count
 
 socket_builders = {}    # Registered socket builders
 
@@ -154,10 +156,11 @@ class CobraMethod:
 
     def __call__(self, *args, **kwargs):
         name = self.proxy._cobra_name
-        if verbose: print "CALLING:",name,self.methname,repr(args)[:20],repr(kwargs)[:20]
-    
-        async = kwargs.pop('_cobra_async',None)
-        if async:
+        if verbose:
+            logger.debug("CALLING: %s, %s, %s, %s" % (name, self.methname, repr(args)[:20], repr(kwargs)[:20]))
+
+        casync = kwargs.pop('_cobra_async', None)
+        if casync:
             csock = self.proxy._cobra_getsock()
             return csock.cobraAsyncTransaction(COBRA_CALL, name, (self.methname, args, kwargs))
 
@@ -167,7 +170,7 @@ class CobraMethod:
         if mtype == COBRA_CALL:
             return data
         if mtype == COBRA_NEWOBJ:
-            uri = swapCobraObject(self.proxy._cobra_uri,data)
+            uri = swapCobraObject(self.proxy._cobra_uri, data)
             return CobraProxy(uri)
         raise data
 
@@ -229,7 +232,7 @@ class CobraSocket:
 
         try:
             buf = self.dumps(data)
-        except Exception, e:
+        except Exception as e:
             raise CobraPickleException("The arguments/attributes must be serializable: %s" % e)
 
         objname = toUtf8(objname)

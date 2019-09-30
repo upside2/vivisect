@@ -13,6 +13,7 @@ import string
 import struct
 import weakref
 import hashlib
+import logging
 import itertools
 import traceback
 import threading
@@ -49,6 +50,9 @@ from vivisect.const import *
 from vivisect.defconfig import *
 
 import vivisect.analysis.generic.emucode as v_emucode
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(name)s: %(message)s')
+logger = logging.getLogger()
 
 def guid(size=16):
     return hexlify(os.urandom(size))
@@ -2138,7 +2142,7 @@ class VivWorkspace(e_mem.MemoryObject, viv_base.VivWorkspaceCore):
         if filelocal:
             segtup = self.getSegment(va)
             if segtup == None:
-                print "Failed to find file for 0x%.8x (%s) (and filelocal == True!)"  % (va, name)
+                logger.warning("Failed to find file for 0x%.8x (%s) (and filelocal == True!)"  % (va, name))
             if segtup != None:
                 fname = segtup[SEG_FNAME]
                 if fname != None:

@@ -35,7 +35,7 @@ class LockStepper:
         plat = trace.getMeta('Platform')
 
         # gotta setup fs at least...
-        if plat == 'windows' and self.archname in ('i386','amd64'):
+        if plat == 'windows' and self.archname in ('i386', 'amd64'):
             tid = trace.getCurrentThread()
             tinfo = trace.getThreads().get(tid)
             self.emu.setSegmentInfo(e_i386.SEG_FS, tinfo, 0xffffffff)
@@ -47,27 +47,27 @@ class LockStepper:
         self.emu.getMemoryMaps = self.memcache.getMemoryMaps
 
         regctx = trace.getRegisterContext()
-        self.emu.setRegisterSnap( regctx.getRegisterSnap() )
+        self.emu.setRegisterSnap(regctx.getRegisterSnap())
 
     def stepi(self, count=1):
         for i in xrange(count):
             emupc = self.emu.getProgramCounter()
             tracepc = self.trace.getProgramCounter()
-            #print('pc: 0x%.8x' % emupc)
-            #print('hex: %s' % self.emu.readMemory(emupc, 16).encode('hex'))
-            #print('trace: 0x%.8x' % tracepc)
-            #print('hex: %s' % self.trace.readMemory(tracepc, 16).encode('hex'))
+            # print('pc: 0x%.8x' % emupc)
+            # print('hex: %s' % self.emu.readMemory(emupc, 16).encode('hex'))
+            # print('trace: 0x%.8x' % tracepc)
+            # print('hex: %s' % self.trace.readMemory(tracepc, 16).encode('hex'))
 
             op1 = self.emu.parseOpcode( self.emu.getProgramCounter() )
-            #print('0x%.8x: %r' % (op1.va, op1))
+            # print('0x%.8x: %r' % (op1.va, op1))
 
             op2 = self.trace.parseOpcode( self.trace.getProgramCounter() )
-            #print('0x%.8x: %r' % (op2.va, op2))
+            # print('0x%.8x: %r' % (op2.va, op2))
 
             try:
                 self.emu.stepi()
-            except Exception, e:
-                raise Exception('Emu Exception: %s on %s' % (e,repr(op1)))
+            except Exception as e:
+                raise Exception('Emu Exception: %s on %s' % (e, repr(op1)))
 
             try:
                 self.trace.stepi()
