@@ -15,8 +15,23 @@ from cStringIO import StringIO
 logger = logging.getLogger(__name__)
 
 
+arch_names = {
+    Elf.EM_ARM: 'arm',
+    Elf.EM_386: 'i386',
+    Elf.EM_X86_64: 'amd64',
+    Elf.EM_MSP430: 'msp430',
+    Elf.EM_ARM_AARCH64: 'aarch64',
+}
+
+archcalls = {
+    'i386': 'cdecl',
+    'amd64': 'sysvamd64call',
+    'arm': 'armcall',
+}
+
+
 def parseFile(vw, filename, baseaddr=None):
-    fd = file(filename, 'rb')
+    fd = open(filename, 'rb')
     elf = Elf.Elf(fd)
     return loadElfIntoWorkspace(vw, elf, filename=filename, baseaddr=baseaddr)
 
@@ -50,7 +65,7 @@ def makeStringTable(vw, va, maxva):
                 l = vw.makeString(va)
                 va += l[vivisect.L_SIZE]
             except Exception:
-                logger.exception("makeStringTable hit exception"
+                logger.exception("makeStringTable hit exception")
                 return
 
 
@@ -62,6 +77,7 @@ def makeSymbolTable(vw, va, maxva):
         ret.append(s)
         va += len(s)
     return ret
+
 
 def makeDynamicTable(vw, va, maxva):
     ret = []
@@ -76,6 +92,7 @@ def makeDynamicTable(vw, va, maxva):
             break
     return ret
 
+
 def makeRelocTable(vw, va, maxva, addbase, baseaddr):
     while va < maxva:
         s = vw.makeStructure(va, "elf.Elf32Reloc")
@@ -83,25 +100,12 @@ def makeRelocTable(vw, va, maxva, addbase, baseaddr):
         vw.setComment(va, tname)
         va += len(s)
 
-arch_names = {
-    Elf.EM_ARM:'arm',
-    Elf.EM_386:'i386',
-    Elf.EM_X86_64:'amd64',
-    Elf.EM_MSP430:'msp430',
-    Elf.EM_ARM_AARCH64:'aarch64',
-}
-
-archcalls = {
-    'i386':'cdecl',
-    'amd64':'sysvamd64call',
-    'arm':'armcall',
-}
 
 def loadElfIntoWorkspace(vw, elf, filename=None, baseaddr=None):
 
     arch = arch_names.get(elf.e_machine)
     if arch is None:
-       raise Exception("Unsupported Architecture: %d\n", elf.e_machine)
+        raise Exception("Unsupported Architecture: %d\n", elf.e_machine)
 
     platform = elf.getPlatform()
 
@@ -110,7 +114,7 @@ def loadElfIntoWorkspace(vw, elf, filename=None, baseaddr=None):
     vw.setMeta('Platform', platform)
     vw.setMeta('Format', 'elf')
 
-    vw.setMeta('DefaultCall', archcalls.get(arch,'unknown'))
+    vw.setMeta('DefaultCall', archcalls.get(arch, 'unknown'))
 
     vw.addNoReturnApi("*.exit")
 
@@ -122,7 +126,7 @@ def loadElfIntoWorkspace(vw, elf, filename=None, baseaddr=None):
     if baseaddr is None:
         baseaddr = elf.getBaseAddress()
 
-    #FIXME make filename come from dynamic's if present for shared object
+    # FIXME make filename come from dynamic's if present for shared object
     if filename is None:
         filename = "elf_%.8x" % baseaddr
 
