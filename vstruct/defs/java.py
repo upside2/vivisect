@@ -211,25 +211,25 @@ if __name__ == '__main__':
         fbytes = file(fname,'rb').read()
         c = JavaClass()
         try:
-            c.vsParse( fbytes )
-            print c.tree()
+            c.vsParse(fbytes)
+            print(c.tree())
 
-            cname = c.getClassName() 
+            cname = c.getClassName()
             sname = c.getSuperClassName()
-            print('Java Class: %s (inherits: %s)' % ( cname, sname ))
+            print('Java Class: %s (inherits: %s)' % (cname, sname))
 
             for fname,descname,attrs in c.getClassFields():
-                print('Field: %s (%s) (attrs: %r)' % ( fname, descname, attrs.keys()) )
+                print('Field: %s (%s) (attrs: %r)' % (fname, descname, attrs.keys()))
 
             for methname,attrs in c.getClassMethods():
                 print('Method: %s (attrs: %r)' % (methname, attrs.keys()))
 
             print('Constants:')
             for fname,const in c.const_pool:
-                print const.tag,const.data.tree()
+                print(const.tag,const.data.tree())
 
-            print c.getClassAttributes().keys()
+            print(c.getClassAttributes().keys())
 
-        except Exception, e:
+        except Exception:
             print c.tree()
             traceback.print_exc()

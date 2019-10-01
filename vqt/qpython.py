@@ -13,12 +13,14 @@ except:
 from vqt.main import idlethread
 from vqt.basics import *
 
+
 @idlethread
 def scripterr(msg, info):
     msgbox = QMessageBox()
     msgbox.setText('Script Error: %s' % msg)
     msgbox.setInformativeText(info)
     msgbox.exec_()
+
 
 class ScriptThread(Thread):
 
@@ -31,8 +33,9 @@ class ScriptThread(Thread):
     def run(self):
         try:
             exec(self.cobj, self.locals)
-        except Exception, e:
+        except Exception as e:
             scripterr(str(e), traceback.format_exc())
+
 
 class VQPythonView(QWidget):
 

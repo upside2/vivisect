@@ -1,6 +1,7 @@
 import os
 import struct
 import logging
+import traceback
 
 import Elf
 import vivisect
@@ -13,23 +14,28 @@ from cStringIO import StringIO
 
 logger = logging.getLogger(__name__)
 
+
 def parseFile(vw, filename, baseaddr=None):
     fd = file(filename, 'rb')
     elf = Elf.Elf(fd)
     return loadElfIntoWorkspace(vw, elf, filename=filename, baseaddr=baseaddr)
+
 
 def parseBytes(vw, bytes, baseaddr=None):
     fd = StringIO(bytes)
     elf = Elf.Elf(fd)
     return loadElfIntoWorkspace(vw, elf, baseaddr=baseaddr)
 
+
 def parseFd(vw, fd, filename=None, baseaddr=None):
     fd.seek(0)
     elf = Elf.Elf(fd)
     return loadElfIntoWorkspace(vw, elf, filename=filename, baseaddr=baseaddr)
 
+
 def parseMemory(vw, memobj, baseaddr):
     raise Exception('FIXME implement parseMemory for elf!')
+
 
 def makeStringTable(vw, va, maxva):
 
@@ -43,9 +49,10 @@ def makeStringTable(vw, va, maxva):
                     return
                 l = vw.makeString(va)
                 va += l[vivisect.L_SIZE]
-            except Exception, e:
-                print "makeStringTable",e
+            except Exception:
+                logger.exception("makeStringTable hit exception"
                 return
+
 
 def makeSymbolTable(vw, va, maxva):
     ret = []
@@ -266,8 +273,8 @@ def loadElfIntoWorkspace(vw, elf, filename=None, baseaddr=None):
                     else:
                         vw.verbprint('unknown reloc type: %d %s (at %s)' % (rtype, name, hex(rlva)))
 
-        except vivisect.InvalidLocation, e:
-            print "NOTE",e
+        except vivisect.InvalidLocation:
+            logger.exception("ELF parser hit invalid location exception")
 
     for s in elf.getDynSyms():
         stype = s.getInfoType()
@@ -335,8 +342,8 @@ def loadElfIntoWorkspace(vw, elf, filename=None, baseaddr=None):
         if vw.isValidPointer(sva) and len(s.name):
             try:
                 vw.makeName(sva, s.name, filelocal=True)
-            except Exception, e:
-                print "WARNING:",e
+            except Exception:
+                logger.exception("getSymbols hit exception")
 
     if vw.isValidPointer(elf.e_entry):
         vw.addExport(elf.e_entry, EXP_FUNCTION, '__entry', fname)
